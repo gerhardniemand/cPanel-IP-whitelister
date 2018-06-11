@@ -5,6 +5,7 @@ whitelist() {
 }
 remove() {
         #add your IPset / IPtables here.
+        echo "" > /dev/null
 }
 #Initialisation script, which will download the necessary files and place them in the correct directories.
 #Also create etc folder with sitelist file
