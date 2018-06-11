@@ -1,0 +1,73 @@
+#!/bin/bash
+whitelist() {
+        #add your IPset / IPtables here.
+        /scripts/cphulkdwhitelist $i
+}
+remove() {
+        #add your IPset / IPtables here.
+}
+#Initialisation script, which will download the necessary files and place them in the correct directories.
+#Also create etc folder with sitelist file
+if [[ $1 == 'init' ]] ; then
+ mkdir /etc/ip_whitelist/
+ touch /etc/ip_whitelist/sitelist
+ chmod -R 700 /etc/ip_whitelist
+ echo "*/2 * * * * root ip_whitelist" >> /etc/crontab
+ installlocation=/root/ip_whitelist.tgz
+ pluginlocation=/usr/local/cpanel/base/frontend/paper_lantern/
+ pluginhome=/usr/local/cpanel/base/frontend/paper_lantern/ip_whitelist
+ scriptlocation=/usr/local/cpanel/base/frontend/paper_lantern/ip_whitelist/ip_whitelist
+ echo "installing plugin"
+ cd $pluginlocation
+ /usr/local/cpanel/scripts/install_plugin --theme paper_lantern $installlocation
+ mkdir $pluginhome
+ #download index.html
+ echo "downloading index.live.php"
+ cd $pluginhome
+ #this can be manual
+ cp /root/index.live.php $pluginhome/index.live.php
+ #copy script to /usr/bin and chmod it
+ echo "installing whitelist script"
+ cat /root/ip_whitelist > /usr/bin/ip_whitelist
+ chmod 700 /usr/bin/ip_whitelist
+ cd /root
+ echo "Cleaning up"
+ rm $installlocation
+ rm ip_whitelist
+ echo exiting
+ exit
+fi
+
+if [ $1 == "disable" ] ; then
+ touch /usr/local/cpanel/base/frontend/paper_lantern/ip_whitelist/disabled
+ exit
+fi
+
+if [ $1 == "enable" ] ; then
+ rm /usr/local/cpanel/base/frontend/paper_lantern/ip_whitelist/disabled
+ exit
+fi
+
+#if disabled file exists, exit the program early
+if [ -f "/usr/local/cpanel/base/frontend/paper_lantern/ip_whitelist/disabled" ] ; then
+  echo "Program is currently disabled"
+  exit
+fi
+#populate sitelist
+echo "" > /etc/ip_whitelist/sitelist
+find /home/*/ -maxdepth 1 -iname .ipwhitelist -printf '%h\n' >> /etc/ip_whitelist/sitelist
+
+
+#whitelist ips in sitelists
+for site in `cat /etc/ip_whitelist/sitelist` ; do
+  for ip in `cat $site/.ipwhitelist | cut -d ',' -f1` ; do
+   whitelist $ip
+  done
+done
+#remove removed ips from whitelist
+for site in `cat /etc/ip_whitelist/sitelist | cut -d ',' -f1` ; do
+  for ip in `cat $site/.removedips` ; do
+   remove $ip
+  done
+done
+echo "" > $site/.removedips
