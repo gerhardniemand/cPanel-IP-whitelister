@@ -59,7 +59,7 @@ if(isset($_POST['ip_remove'])){
  }else{
    //log injection attempt if user tries to manipulate IP address to remove
    print_r("<div class='alert alert-dismissible alert-danger'>Injection attept has been logged with Server Administrator.</div>");
-   mail("dowaynebreedt@gmail.com","Injection attempt on ".$_ENV['HOST'],"The user tried to inject the following string into the remove function: ".$ip_addr);
+   mail("you@yourmail.com","Injection attempt on ".$_ENV['HOST'],"The user tried to inject the following string into the remove function: ".$ip_addr);
  }
 }
 $ips = split(',',file_get_contents($whitelist_file));
