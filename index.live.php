@@ -8,7 +8,7 @@ print $cpanel->header('IP Whitelist');
 
 #if disabled file is present, display disabled on cPanel
 if(file_exists("/usr/local/cpanel/base/frontend/paper_lantern/ip_whitelist/disabled")){
-   print_r("<h3>The IP Whitelist plugin is currently disabled, please try again later.</h3>");
+   echo "<h3>The IP Whitelist plugin is currently disabled, please try again later.</h3>";
    exit;
 }
 
@@ -36,9 +36,9 @@ if(isset($_POST['ip_add'])){
   $removed_ips = file_get_contents($removed_ips_file);
   $removed_ips = str_replace($ip_addr.",","",$removed_ips);
   file_put_contents($removed_ips_file,$removed_ips);
-  print_r("<div class='alert alert-dismissible alert-info info'>".$ip_addr." has been added to whitelist<br><br></div>");
+  echo "<div class='alert alert-dismissible alert-info info'>".$ip_addr." has been added to whitelist<br><br></div>";
  }else{
-  print_r("<div class='alert alert-dismissible alert-info info'>".$ip_addr." is not a valid IP</div>\n");
+  echo "<div class='alert alert-dismissible alert-info info'>".$ip_addr." is not a valid IP</div>".PHP_EOL;
  }
 }
 if(isset($_POST['ip_remove'])){
@@ -55,10 +55,10 @@ if(isset($_POST['ip_remove'])){
    $removed_ips = $removed_ips.$ip_addr;
    file_put_contents($removed_ips_file,$removed_ips);
    $noips = countips($removed_ips);
-   print_r("<div class='alert alert-dismissible alert-info info'>".$_POST['ip_remove']." has been removed from whitelist<br><br></div>");
+   echo "<div class='alert alert-dismissible alert-info info'>".$_POST['ip_remove']." has been removed from whitelist<br><br></div>";
  }else{
    //log injection attempt if user tries to manipulate IP address to remove
-   print_r("<div class='alert alert-dismissible alert-danger'>Injection attept has been logged with Server Administrator.</div>");
+   echo "<div class='alert alert-dismissible alert-danger'>Injection attept has been logged with Server Administrator.</div>";
    mail("you@yourmail.com","Injection attempt on ".$_ENV['HOST'],"The user tried to inject the following string into the remove function: ".$ip_addr);
  }
 }
